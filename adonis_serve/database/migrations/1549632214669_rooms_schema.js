@@ -9,6 +9,7 @@ class RoomsSchema extends Schema {
       table.increments()
       table.string("name")
       table.string("sj_code")
+      table.string('status').defaultTo("off")
       table.timestamps()
     })
   }
