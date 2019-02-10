@@ -1,14 +1,14 @@
 export default {
     namespaced: true,
     state: {
-        user: null,
+        teacher: null,
     },
     mutations: {
         setUser(state, data) {
-            this.user = data
+            this.state.teacher = data
         },
         resetUser(state) {
-            this.user = null
+            this.state.teacher = null
         },
 
     },
@@ -30,12 +30,14 @@ export default {
             let user = null;
 
             if (!token) {
+                console.log('has token ')
                 token = localStorage.access_token
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
             }
             if (token) {
+                console.log('no token ')
                 user = await axios.get('/teacher/getuser').then((response) => {
-                    context.commit('setUser', response.data)
+                    context.commit("setUser", response.data)
                     console.log('setUser',response.data)
                     return response.data;
                 }).catch((error) => {

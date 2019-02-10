@@ -1,16 +1,48 @@
 <template>
-      <h1> home Teacher {{user}}</h1>
-      
+  <div class="container" v-if="user">
+    <h1>home Teacher : {{user.last_name}}</h1>
+    <hr>
+    <div class="content">
+      <aside v-if="subject">
+        <select v-model="sjSelect" aria-placeholder="select">
+          <option selected disabled>Choose here</option>
+          <option v-bind:key="index" v-for="(s,index) in subject">{{s.code}} - {{s.name}}</option>
+        </select>
+        <input type="button" value="ลงทะเบียนสอน" @click="goenroll">
+        {{sjSelect}}
+      </aside>
+
+      <section>
+        <h1>วิชาที่คุณสอน</h1>
+        <ul>
+          <li></li>
+        </ul>
+      </section>
+    </div>
+  </div>
 </template>
 <script>
 export default {
-      data : () => ({
-            user :null 
-      }),
-      async created () {
-            this.user = await this.$store.dispatch('teacher/getUser')
-      }
-}
+  data: () => ({
+    user: null,
+    sjSelect: "Choose here",
+    subject: null,
+    sjenroll: null
+  }),
+  async created() {
+    this.user = await this.$store.dispatch("teacher/getUser");
+
+    this.subject = await this.$store.dispatch("subject/getSubject");
+    this.sjenroll = this.$store.dispatch("teacherSubject/getSubjectEnrolled");
+  },
+  methods: {
+    goenroll() {
+      let posDash = this.sjSelect.indexOf("-");
+      let sj = this.sjSelect.substring(0, posDash - 1);
+      this.$store.dispatch("teacherSubject/enrollSubject", sj);
+    }
+  }
+};
 </script>
 
 

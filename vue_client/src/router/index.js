@@ -38,7 +38,7 @@ export default new Router({
       component: UserTemplate,
       children: [
         {
-          path: '/home',
+          path: 'home',
           name: 'home-user',
           component:  UserHome
         },
@@ -55,7 +55,7 @@ export default new Router({
       component: TeacherTemplate,
       children: [
         {
-          path: '/home',
+          path: 'home',
           name: 'home-teacher',
           component: TeacherHome
         },
