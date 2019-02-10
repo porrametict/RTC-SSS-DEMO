@@ -7,4 +7,9 @@ Route.group("user", async () => {
 Route.group("teacher", async () => {
     require('./api_teacher')
   }).prefix('/api/teacher')
+
+
   
+  Route.group("public", async () => {
+    require('./api_public')
+  }).prefix('/api/public')

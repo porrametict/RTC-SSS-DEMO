@@ -11,6 +11,7 @@ class RoomController {
   constructor ({ socket, request }) {
     this.socket = socket
     this.request = request
+    //console.log('cat',this.socket.topic)
   }
 
   async onEnterRoom  (user) {
@@ -23,6 +24,10 @@ class RoomController {
     this.updatePlayer(user)
 
   }
+
+  onMessage (e) {
+    this.socket.broadcastToAll('message', e)
+  } 
 
   async checkHost(e) {
     //let room_code = this.socket.id

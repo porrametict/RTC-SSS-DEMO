@@ -9,6 +9,7 @@ class TeacherSubjectsSchema extends Schema {
       // table.increments()
       table.string("sj_code").notNullable()
       table.integer("t_id").notNullable()
+      table.timestamps()
     })
   }
 

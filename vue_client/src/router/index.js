@@ -9,6 +9,7 @@ import TeacherLogin from '@/components/Teacher/Login'
 import TeacherHome from '@/components/Teacher/Home'
 import TeacherRoom from '@/components/Teacher/Room'
 import TeacherTemplate from '@/components/Teacher/Template'
+import teacherSubject from '@/components/Teacher/subject';
 
 
 Vue.use(Router)
@@ -60,9 +61,14 @@ export default new Router({
           component: TeacherHome
         },
         {
-          path: 'room',
+          path: 'room/:room_id',
           name: 'room-teacher',
           component: TeacherRoom
+        },
+        {
+          path: 'subject/:sj_code',
+          name: 'subject-teacher',
+          component: teacherSubject
         },
       ]
     },

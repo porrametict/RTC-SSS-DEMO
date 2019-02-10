@@ -3,7 +3,6 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import Ws from "@adonisjs/websocket-client";
 import store from './stores/index'
 import axios from 'axios'
 
@@ -27,7 +26,6 @@ Vue.config.productionTip = false
 
 
 
-window.ws = Ws("ws://localhost:3333");
 
 /* eslint-disable no-new */
 new Vue({

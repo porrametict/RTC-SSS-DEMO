@@ -17,7 +17,7 @@ export default {
             // console.log(params, "in login actions Vuex")
             let data = await axios.post('teacher/login', params)
                 .then((response) => {
-                    console.log(response.data)
+                   // console.log(response.data)
                     localStorage.access_token = response.data.token;
                     return response.data.token
                 }).catch((error) => {
@@ -30,15 +30,15 @@ export default {
             let user = null;
 
             if (!token) {
-                console.log('has token ')
+               // console.log('has token ')
                 token = localStorage.access_token
                 axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
             }
             if (token) {
-                console.log('no token ')
+                //console.log('no token ')
                 user = await axios.get('/teacher/getuser').then((response) => {
                     context.commit("setUser", response.data)
-                    console.log('setUser',response.data)
+                    //console.log('setUser',response.data)
                     return response.data;
                 }).catch((error) => {
                     return null;

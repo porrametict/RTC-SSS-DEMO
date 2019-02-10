@@ -9,6 +9,7 @@ class RoomHostSchema extends Schema {
      // table.increments()
      table.integer('room_id')
      table.integer('host_id')
+     table.timestamps()
      
       //table.timestamps()
     })
