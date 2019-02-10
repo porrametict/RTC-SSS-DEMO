@@ -15,6 +15,7 @@ export default {
   methods : {
         async login () {
             let data  = await this.$store.dispatch("user/login",{"username":this.username,"password":this.password})
+            console.log(data,'data')
             if(data) {
                   this.$router.push({name:'home-user'})
             }

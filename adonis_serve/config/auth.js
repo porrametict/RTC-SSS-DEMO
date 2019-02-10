@@ -16,7 +16,7 @@ module.exports = {
   | Available Serializers - lucid, database
   |
   */
-  authenticator: 'session',
+  authenticator: 'user',
 
   /*
   |--------------------------------------------------------------------------
@@ -27,10 +27,27 @@ module.exports = {
   | Session authentication is always persistent.
   |
   */
+
   session: {
     serializer: 'lucid',
     model: 'App/Models/User',
     scheme: 'session',
+    uid: 'username',
+    password: 'password'
+  },
+
+  user: {
+    serializer: 'lucid',
+    model: 'App/Models/User',
+    scheme: 'api',
+    uid: 'username',
+    password: 'password'
+  },
+
+  teacher: {
+    serializer: 'lucid',
+    model: 'App/Models/Teacher',
+    scheme: 'api',
     uid: 'username',
     password: 'password'
   },

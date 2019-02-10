@@ -17,3 +17,14 @@
 const Route = use('Route')
 
 Route.on('/').render('welcome')
+require('./routes/api')
+
+
+
+///teacher
+Route.resource('teachers', 'TeacherController')
+    .middleware(['auth:teacher'])
+
+Route.post('login-teacher', 'TeacherController.login')
+// Route.post('logout-teacher', 'TeacherController.logout')
+//     .middleware(['auth:teacher'])
