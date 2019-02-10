@@ -101,7 +101,7 @@ class UserController {
   }
 
   async getUser ({auth,request}) {
-    return auth.user
+    return await auth.user
   }
   // async logout ({auth}) { 
   //   await auth.logout()  //canot use in s

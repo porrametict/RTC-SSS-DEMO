@@ -52,7 +52,11 @@ class TeacherController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ auth ,params, request, response, view }) {
+    if (auth.user.id !== Number(params.id)) {
+      return "You cannot see someone else's profile"
+    }
+    return auth.user ; 
   }
 
   /**
@@ -93,7 +97,11 @@ class TeacherController {
     const {username,password} =request.all()
     let token = await auth.authenticator('teacher').attempt(username,password)
     //let user = await auth.getUser()
-    return ['Login in successfully',token]
+    return token
+  }
+
+  async getUser ({auth,request}) {
+    return await auth.authenticator('teacher').user
   }
 
   // async logout ({auth}) {
