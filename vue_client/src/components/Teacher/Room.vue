@@ -6,7 +6,7 @@
 
     <section>
       <ul>
-        <li v-for="(m,index) in messages" v-bind:key="index">{{m.body}} - {{m.user}}</li>
+        <li v-for="(m,index) in messages" v-bind:key="index">{{m.body}} - {{m.user.first_name}}</li>
       </ul>
     </section>
   </div>
@@ -24,13 +24,14 @@ export default {
     inputMessage: null
   }),
   computed: {
-//     ...mapState({
-//       user: state => state.teacher
-//     })
+    ...mapState({
+      user: state => state.teacher.teacher
+    })
   },
   async created() {
-      this.user = localStorage.getItem('user')
-    console.log('catll',this.user['first_name'])
+    if(!this.user){
+        await this.$store.dispatch('teacher/getUser')
+    }
 
     let room_id = this.$route.params.room_id;
     this.roomData = await this.$store.dispatch("room/GetSingleRoom", room_id);

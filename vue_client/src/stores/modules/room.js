@@ -10,10 +10,11 @@ export default {
 
     },
     actions: {
-        async teacherGetRoom(context, params) {
+
+        async GetRooms(context, params) {
             // console.log(params, "in login actions Vuex")
             //console.log('sj',params)
-            let data = await axios.get('teacher/room', { params: { 'sj': params } })
+            let data = await axios.get('public/room', { params: { 'sj': params } })
                 .then((response) => {
                     // context.commit('setSubject',response.data)
                     return response.data
@@ -23,6 +24,7 @@ export default {
                 });
             return data
         },
+
         async createRoom(context, params) {
             let data = await axios.post('teacher/room', params)
                 .then((response) => {
@@ -34,7 +36,7 @@ export default {
             return data
         },
         async GetSingleRoom (context,params) {
-            let data = await axios.get('teacher/room/'+params)
+            let data = await axios.get('public/room/'+params)
                 .then((response) => {
                     // context.commit('setSubject',response.data)
                     return response.data

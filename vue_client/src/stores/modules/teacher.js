@@ -5,10 +5,10 @@ export default {
     },
     mutations: {
         setUser(state, data) {
-            this.state.teacher = data
+            this.state.teacher.teacher = data
         },
         resetUser(state) {
-            this.state.teacher = null
+            this.state.teacher.teacher = null
         },
 
     },

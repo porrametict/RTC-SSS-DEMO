@@ -11,7 +11,7 @@ export default {
     },
     actions: {
         async getSubjectEnrolled (context) {
-            let std_id = this.state.user.id 
+            let std_id = this.state.user.user.id 
             // console.log(t_id,'t_is')
             let data = await axios.get('user/subject',{params:{'id':std_id}})
             .then ((response)=> {
@@ -27,7 +27,7 @@ export default {
         },
         async enrollSubject(context, params) {
             // console.log(params, "in login actions Vuex")
-            let user_id = this.state.user.id
+            let user_id = this.state.user.user.id
             let form = {"sj_code":params,"std_id":user_id}
            // console.log('fa',form)
             let data = await axios.post('user/subject',form )

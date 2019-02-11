@@ -27,7 +27,6 @@ class TeacherSubjectController {
     let data = await Database.select('subjects.code','subjects.name').from('teacher_subjects')
     .where('t_id',form.id)
     .innerJoin('subjects','teacher_subjects.sj_code','subjects.code')
-    
     return data;
 
     

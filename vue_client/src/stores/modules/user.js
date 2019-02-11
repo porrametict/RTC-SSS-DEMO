@@ -5,10 +5,10 @@ export default {
     },
     mutations: {
         setUser(state, data) {
-            this.state.user = data
+            this.state.user.user = data
         },
         resetUser(state) {
-            this.state.user = null
+            this.state.user.user = null
         },
 
     },
@@ -27,6 +27,9 @@ export default {
             return data
         },
         async getUser(context, token) {
+            console.log('get user')
+
+            
             let user = null;
 
             if (!token) {
@@ -36,7 +39,6 @@ export default {
             if (token) {
                 user = await axios.get('/user/getuser').then((response) => {
                     context.commit('setUser', response.data)
-                    console.log('setUser',response.data)
                     return response.data;
                 }).catch((error) => {
                     return null;

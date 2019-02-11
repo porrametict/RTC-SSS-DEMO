@@ -27,7 +27,7 @@ export default {
   }),
   async created() {
     this.sj = this.$route.params.sj_code;
-    this.room = await this.$store.dispatch("room/teacherGetRoom", this.sj);
+    this.room = await this.$store.dispatch("room/GetRooms", this.sj);
   },
   methods : {
       createRoom() {

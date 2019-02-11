@@ -11,7 +11,7 @@ export default {
     },
     actions: {
         async getSubjectEnrolled (context) {
-            let t_id = this.state.teacher.id 
+            let t_id = this.state.teacher.teacher.id 
             // console.log(t_id,'t_is')
             let data = await axios.get('teacher/subject',{params:{'id':t_id}})
             .then ((response)=> {
@@ -27,7 +27,7 @@ export default {
         },
         async enrollSubject(context, params) {
             // console.log(params, "in login actions Vuex")
-            let teacher_id = this.state.teacher.id
+            let teacher_id = this.state.teacher.teacher.id
             let form = {"sj_code":params,"t_id":teacher_id}
            // console.log('fa',form)
             let data = await axios.post('teacher/subject',form )

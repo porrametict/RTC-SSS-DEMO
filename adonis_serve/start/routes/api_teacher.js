@@ -9,7 +9,7 @@ Route.get('getuser', 'TeacherController.getUser').middleware(['auth:teacher'])
 
 Route.resource('subject','TeacherSubjectController').middleware(['auth:teacher'])
 
-Route.resource('room','RoomController').middleware(['auth:teacher'])
+Route.post('room','RoomController.store').middleware(['auth:teacher'])
 
 
 

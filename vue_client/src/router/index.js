@@ -45,7 +45,7 @@ export default new Router({
           component:  UserHome
         },
         {
-          path: 'room',
+          path: 'room/:room_id',
           name: 'room-user',
           component: UserRoom
         },
