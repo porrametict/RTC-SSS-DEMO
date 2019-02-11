@@ -4,6 +4,7 @@ import UserLogin from '@/components/User/Login'
 import UserHome from '@/components/User/Home'
 import UserRoom from '@/components/User/Room'
 import UserTemplate from '@/components/User/Template'
+import UserSubject from '@/components/User/Subject'
 
 import TeacherLogin from '@/components/Teacher/Login'
 import TeacherHome from '@/components/Teacher/Home'
@@ -47,6 +48,11 @@ export default new Router({
           path: 'room',
           name: 'room-user',
           component: UserRoom
+        },
+        {
+          path: 'subject/:sj_code',
+          name: 'subject-user',
+          component: UserSubject
         },
       ]
     },

@@ -1,19 +1,18 @@
 'use strict'
 
-const TS = use('App/Models/TeacherSubject') 
+const StdEnroll = use('App/Models/StdEnroll')
 const Database = use('Database')
-
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 /**
- * Resourceful controller for interacting with teachersubjects
+ * Resourceful controller for interacting with studentenrolls
  */
-class TeacherSubjectController {
+class StudentEnrollController {
   /**
-   * Show a list of all teachersubjects.
-   * GET teachersubjects
+   * Show a list of all studentenrolls.
+   * GET studentenrolls
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -21,22 +20,17 @@ class TeacherSubjectController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
-    let form = request.all();
-    //  console.log(form.id,'t_id')
-    // let ts =  await TS.query().where('t_id',form.id).with('hasmany_subject').fetch()
-    let data = await Database.select('subjects.code','subjects.name').from('teacher_subjects')
-    .where('t_id',form.id)
-    .innerJoin('subjects','teacher_subjects.sj_code','subjects.code')
-    
-    return data;
 
-    
-    
+    let form = request.all()
+    let data  = await Database.select('subjects.name','subjects.code').from('std_enrolls')
+    .where('std_id',form.id)
+    .innerJoin('subjects','std_enrolls.sj_code','subjects.code')
+    return data
   }
 
   /**
-   * Render a form to be used for creating a new teachersubject.
-   * GET teachersubjects/create
+   * Render a form to be used for creating a new studentenroll.
+   * GET studentenrolls/create
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -46,30 +40,30 @@ class TeacherSubjectController {
   async create ({ request, response, view }) {
     return {
       "sj_code" : null,
-      "t_id" : null
+      "std_id" : null
     }
   }
 
   /**
-   * Create/save a new teachersubject.
-   * POST teachersubjects
+   * Create/save a new studentenroll.
+   * POST studentenrolls
    *
    * @param {object} ctx
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
-    let rq = request.all()
-    //console.log(rq,"rq")
-    let ts = new TS () ;
-    ts.fill(rq);
-    await ts.save()
-    return ts;
+
+    let rq = request.all();
+    let std_enroll = new StdEnroll ();
+    std_enroll.fill(rq)
+    await std_enroll.save();
+    return std_enroll;
   }
 
   /**
-   * Display a single teachersubject.
-   * GET teachersubjects/:id
+   * Display a single studentenroll.
+   * GET studentenrolls/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -77,12 +71,11 @@ class TeacherSubjectController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
-    
   }
 
   /**
-   * Render a form to update an existing teachersubject.
-   * GET teachersubjects/:id/edit
+   * Render a form to update an existing studentenroll.
+   * GET studentenrolls/:id/edit
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -93,8 +86,8 @@ class TeacherSubjectController {
   }
 
   /**
-   * Update teachersubject details.
-   * PUT or PATCH teachersubjects/:id
+   * Update studentenroll details.
+   * PUT or PATCH studentenrolls/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -104,8 +97,8 @@ class TeacherSubjectController {
   }
 
   /**
-   * Delete a teachersubject with id.
-   * DELETE teachersubjects/:id
+   * Delete a studentenroll with id.
+   * DELETE studentenrolls/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -115,4 +108,4 @@ class TeacherSubjectController {
   }
 }
 
-module.exports = TeacherSubjectController
+module.exports = StudentEnrollController
