@@ -25,7 +25,7 @@ export default {
     },
     methods : {
         enterRoom (id) {
-            this.$router.push({name:'room-user',params:{'room_id':id}})
+            this.$router.push({name:'room-user',params:{'room_id':id,'sj_code':this.sj}})
         }
     }
 }

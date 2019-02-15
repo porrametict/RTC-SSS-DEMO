@@ -34,7 +34,7 @@ export default {
           this.$store.dispatch('room/createRoom',{sj_code:this.sj,name:this.newRoomName})
       },
       enterRoom  (id) {
-          this.$router.push({name:'room-teacher',params:{"room_id":id}})
+          this.$router.push({name:'room-teacher',params:{"room_id":id,"sj_code":this.sj}})
       }
   }
 };

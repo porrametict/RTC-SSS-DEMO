@@ -1,5 +1,9 @@
 'use strict'
 
+const Score = use('App/Models/Score')
+
+
+
 // room states -> normal , active
 //  game_state -> questioning , select_respondent , answering , end > report 
 
@@ -8,46 +12,56 @@ let host_room = {};
 
 
 class RoomController {
-  constructor ({ socket, request }) {
+  constructor({ socket, request }) {
     this.socket = socket
     this.request = request
     //console.log('cat',this.socket.topic)
   }
 
-  async onEnterRoom  (user) {
-    if(!this.checkHost(user)) { //ตรวจสอบว่าเป็นเจ้าของห้องหรือไม่ 
-        players.push({ "user": user, "socket_id": this.socket.id })
-    }else {
-        host_room = {"host" : user,"socket_id": this.socket.id }
+  async onJoinRoom(e) {
+    if (e.ishost == true) {
+      host_room = { user: e.user, socket_id: this.socket.id }
+    } else {
+      // this.checkNewUser(e.user.id)
+      players.push({ user: e.user, socket_id: this.socket.id })
+      
     }
-    players.push()
-    this.updatePlayer(user)
-
+    this.updatePlayer()
   }
 
-  onMessage (e) {
-    this.socket.broadcastToAll('message', e)
-  } 
+  onMessage(e) {
+    this.socket.broadcastToAll('message', e)  
+  }
 
-  async checkHost(e) {
-    //let room_code = this.socket.id
-    // let end = room_code.indexOf("#")
-    // room_code = room_code.substring(5, end)
-    // //console.log(room_code)
-    // let room = await Room.findBy("room_code", room_code)
-    // // console.log(room.toJSON().host_id)
-    // let host_id = room.toJSON().host_id
-    // if (host_id == e.id) {
-    //   host = { user: e, socket_id: this.socket.id }
-    //   this.socket.emit("isHost", true)
-    // }
+  async onClose (e) {
+    console.log("close")
+    this.removeUserFromSocket(this.socket.id)
+    await this.updatePlayer()
+    this.socket.close();
   }
 
 
-  updatePlayer(e) {
-    // this.socket.broadcastToAll("getPlayers", players)
-    // this.socket.broadcastToAll("newPlayer", e)
-    // console.log(players)
+  /// user control
+
+  removeUserFromSocket (sk) {
+    players = players.filter(function(value){
+      return value.socket_id != sk
+    })
+  }
+  
+
+  // checkNewUser (userId) {
+  //   players.forEach( val => {
+  //     console.log(val.user.id,val.socket_id,userId) 
+  //   })
+  // }
+  async updatePlayer(e) {
+    console.log('update',players)
+    let empty = players.length == 0 ? true : false;
+    await this.socket.broadcastToAll("updatePlayer", {players:players,empty:empty})
+    await console.log('finish')
+    return "";
+
   }
 }
 
