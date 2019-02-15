@@ -1,11 +1,14 @@
 <template>
   <div class="container" v-if="user">
     <h1>Room Teacher</h1>
-    <input type="button" @click="gameStart" value="Game Start">
     <hr>
-    <input type="text" v-model="inputMessage" @keypress.13="sendMessage(inputMessage)">
+    <!-- normal -->
+    <div v-if="roomState =='normal'">
+      <input type="button" @click="gameStart" value="Game Start"> <br>
+      <input type="text" v-model="inputMessage" @keypress.13="sendMessage(inputMessage)">
+    </div>
+    <div class="flex_container" v-if="roomState =='normal'">
 
-    <div class="flex_container">
       <aside>
         <h3>All players ({{players.length}})</h3>
         <ul>
@@ -21,6 +24,32 @@
         </ul>
       </section>
     </div>
+    <!-- active -->
+    <div v-else>
+      <!-- questioning -->
+      <div v-if="gameState =='questioning'">
+        <h1>เกมได้เริ่มขึ้นเเล้ว ตั้งคำถามได้เลย</h1>
+        <input type="text" placeholder="กรอกคำถามของคุณ" v-model="question">
+        <input type="button" value="ส่งคำถาม" @click="sendQuestion(question)">
+      </div>
+      <!-- select_respondent -->
+      <div v-else-if="gameState == 'select_respondents'">
+        <h1>นี่คือคนที่ต้องการจะตอบ</h1>
+        <ul>
+          <li v-for="(r,index) in responents" v-bind:key="index">
+            {{r.first_name}} {{r.last_name}} 
+              <input type="button" value="เลือกคนนี้" @click="selectRespondents(r.id)">
+          </li>
+        </ul>
+      </div>
+       <!-- consider_solutions -->
+      <div v-else-if="gameState == 'consider_solutions'">
+        <h1>คำตอบ ;  {{answer}}</h1>
+        <input type="button" value="ถูกต้อง" @click="solution(true)">
+        <input type="button" value="ผิด" @click="solution(false)">
+      </div>
+
+    </div>
   </div>
 </template>
 <script>
@@ -34,7 +63,12 @@ export default {
     roomData: null,
     room: null,
     messages: [],
-    inputMessage: null
+    inputMessage: null,
+    roomState: "normal",
+    gameState: "questioning",
+    question: "",
+    responents: [],
+    answer : ''
   }),
   computed: {
     ...mapState({
@@ -58,7 +92,6 @@ export default {
 
     let room_id = this.$route.params.room_id;
     this.roomData = await this.$store.dispatch("room/GetSingleRoom", room_id);
-    //console.log(this.room)
     this.connectServe();
   },
 
@@ -73,7 +106,7 @@ export default {
         this.reciveMessage(e);
       });
       this.room.on("updatePlayer", e => {
-        console.log("up",e,e.players)
+        console.log("up", e, e.players);
         this.players = e.players;
       });
       this.room.on("close", e => {
@@ -83,6 +116,18 @@ export default {
           "sj-code": this.$route.params.sj_code
         });
       });
+
+      // game
+      this.room.on("active", () => {
+        this.roomState = "active";
+      });
+      this.room.on("hasRespondents", e => {
+        this.responents.push(e);
+      });
+      this.room.on('answer',e=>{
+        this.answer = e
+        this.gameState = 'consider_solutions'
+      })
     },
     // room control
     sendMessage: async function(message) {
@@ -93,24 +138,28 @@ export default {
     },
     confirmExit(e) {
       e.preventDefault();
-
-      // if (this.windowState) {
-      //   alert("You leave this room.");
-
-      // } else {
-      //   this.windowState = true;
-      //   e.returnValue = "";
-      // }
       return "";
     },
     exitRoom() {
-      
       this.room.emit("close");
     },
 
     /// game Control
     gameStart() {
       this.room.emit("gameStart");
+    },
+
+    //game state
+    sendQuestion(question) {
+      this.room.emit("question", question);
+      this.gameState = "select_respondents";
+    },
+    selectRespondents (id) {
+      this.room.emit("getRespondents",id)
+      this.gameState = 'answering'
+    },
+    solution(result) {
+      this.room.emit('solution',result)
     }
   }
 };
