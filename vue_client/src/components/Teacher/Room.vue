@@ -4,11 +4,11 @@
     <hr>
     <!-- normal -->
     <div v-if="roomState =='normal'">
-      <input type="button" @click="gameStart" value="Game Start"> <br>
+      <input type="button" @click="gameStart" value="Game Start">
+      <br>
       <input type="text" v-model="inputMessage" @keypress.13="sendMessage(inputMessage)">
     </div>
     <div class="flex_container" v-if="roomState =='normal'">
-
       <aside>
         <h3>All players ({{players.length}})</h3>
         <ul>
@@ -37,18 +37,51 @@
         <h1>นี่คือคนที่ต้องการจะตอบ</h1>
         <ul>
           <li v-for="(r,index) in responents" v-bind:key="index">
-            {{r.first_name}} {{r.last_name}} 
-              <input type="button" value="เลือกคนนี้" @click="selectRespondents(r.id)">
+            {{r.first_name}} {{r.last_name}}
+            <input
+              type="button"
+              value="เลือกคนนี้"
+              @click="selectRespondents(r.id)"
+            >
           </li>
         </ul>
       </div>
-       <!-- consider_solutions -->
-      <div v-else-if="gameState == 'consider_solutions'">
-        <h1>คำตอบ ;  {{answer}}</h1>
-        <input type="button" value="ถูกต้อง" @click="solution(true)">
-        <input type="button" value="ผิด" @click="solution(false)">
+
+      <!-- answering -->
+      <div v-else-if="gameState == 'answering'">
+        <h1>ผู้ถูกเลือกกำลังตอบ</h1>
       </div>
 
+      <!-- consider_solutions -->
+      <div v-else-if="gameState == 'consider_solutions'">
+        <h1>คำตอบ ; {{answer}}</h1>
+        <input type="button" value="ถูกต้อง" @click="solution(true)">
+        <input type="button" value="ผิด" @click="solution(false)">
+        <hr>
+      </div>
+
+      <div v-else-if="gameState == 'checked_answer'">
+        <div v-if="solution_q==false">
+          <h1>จะดำเนินการอย่างไรต่อ</h1>
+          <input type="button" value="ใช้คำถามเดิม เลือกคนตอบใหม่" @click="newRespondents()">
+          <input type="button" value="ข้ามข้อนี้ ไปข้อใหม่" @click="newQuestion()">
+          <input type="button" value="จบเกมส์" @click="endGame()">
+        </div>
+        <div v-else>
+          <h1>จะดำเนินการอย่างไรต่อ</h1>
+          <input type="button" value="ไปข้อใหม่" @click="newQuestion()">
+          <input type="button" value="จบเกมส์" @click="endGame()">
+        </div>
+      </div>
+
+      <!-- endGame -->
+      <div v-else-if="gameState == 'endGame'">
+        <h1>เกมส์จบเเล้ว</h1>
+        <ul>
+          <li v-for="(s,index) in score_report" v-bind:key="index">{{s}}</li>
+        </ul>
+        <input type="button" value="บันทึกเเละออก" @click="exitGame()">
+      </div>
     </div>
   </div>
 </template>
@@ -68,7 +101,9 @@ export default {
     gameState: "questioning",
     question: "",
     responents: [],
-    answer : ''
+    answer: "",
+    solution_q: null,
+    score_report: []
   }),
   computed: {
     ...mapState({
@@ -99,7 +134,7 @@ export default {
     connectServe: function() {
       ws.connect();
       this.room = ws.subscribe(`room:${this.roomData.id}`);
-      this.room.on("ready", () => {
+      this.room.on("resady", () => {
         this.room.emit("joinRoom", { user: this.user, ishost: true });
       });
       this.room.on("message", e => {
@@ -124,10 +159,16 @@ export default {
       this.room.on("hasRespondents", e => {
         this.responents.push(e);
       });
-      this.room.on('answer',e=>{
-        this.answer = e
-        this.gameState = 'consider_solutions'
-      })
+      this.room.on("answer", e => {
+        this.answer = e;
+        this.gameState = "consider_solutions";
+      });
+      this.room.on("checked_answer", () => {
+        this.gameState = "checked_answer";
+      });
+      this.room.on("endGame", e => {
+        this.score_report = e;
+      });
     },
     // room control
     sendMessage: async function(message) {
@@ -154,12 +195,35 @@ export default {
       this.room.emit("question", question);
       this.gameState = "select_respondents";
     },
-    selectRespondents (id) {
-      this.room.emit("getRespondents",id)
-      this.gameState = 'answering'
+    selectRespondents(id) {
+      this.room.emit("getRespondents", id);
+      this.gameState = "answering";
     },
     solution(result) {
-      this.room.emit('solution',result)
+      this.room.emit("solution", result);
+      this.solution_q = result;
+    },
+    newRespondents() {
+      this.gameState = "select_respondents";
+      this.room.emit("newRespondents");
+    },
+    newQuestion() {
+      this.room.emit("newQuestion");
+      this.gameState = "questioning";
+      this.question = "";
+      this.responents = [];
+      this.answer = "";
+    },
+    endGame() {
+      this.room.emit("endGame");
+      this.gameState = "endGame";
+      this.question = "";
+      this.responents = [];
+      this.answer = "";
+    },
+    exitGame(){
+      this.room.emit("exitGame")
+      this.roomState = 'normal'
     }
   }
 };

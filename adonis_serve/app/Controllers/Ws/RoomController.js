@@ -9,6 +9,9 @@ const Room= use('App/Models/Room')
 //  game_state_student -> questioning , has_question,select_respondents , answering ,consider_solutions, end > report 
 let players = [];
 let host_room = {};
+let respondents_id = '';
+let scores = []
+
 
 
 class RoomController {
@@ -55,14 +58,43 @@ class RoomController {
 
   onGetRespondents (e) {
     this.socket.broadcastToAll('gotRespondents',e)
+    respondents_id = e
   }
   onAnswer (e) {
     this.socket.broadcastToAll('answer',e)
   }
   onSolution (e) {
     this.socket.broadcastToAll("solution",e)
+    if(e){ // true
+        this.collectScore(1,respondents_id)    
+    }
+    this.socket.broadcastToAll("checked_answer",e)
   } 
-
+  onNewRespondents () {
+    this.socket.broadcastToAll("newRespondents")
+  }
+  onNewQuestion () {
+    this.socket.broadcastToAll('newQuestion')
+  }
+  onEndGame () {
+    this.socket.broadcastToAll('endGame',scores)
+    //console.log(scores,"scores")
+  }
+  async onExitGame () {
+    scores.forEach(async (val)=> {
+      let newScore = new Score();
+      let r_id = this.getRoomId()
+      let new_score_data = {"room_id":r_id,"std_code":val.userId,"score":val.score}
+      newScore.fill(new_score_data)
+      await newScore.save()
+    })
+  }
+  /// room
+  getRoomId () {
+    let room = this.socket.topic
+    let room_id = room.substring(room.indexOf(":")+1)
+    return room_id
+  }
 
 
   /// user control
@@ -73,7 +105,6 @@ class RoomController {
     })
   }
 
-
   
   async updatePlayer(e) {
     // console.log('update',players)
@@ -83,6 +114,21 @@ class RoomController {
     return "";
 
   }
+   // score
+   collectScore (score,r_id) {
+    let new_user_score = true
+    scores.forEach(val=>{
+      if(val.userId == r_id){
+        val.score += score
+        new_user_score = false
+      }
+    })
+    if(new_user_score){
+      scores.push({userId:r_id,score:score})
+    }
+    console.log('collectScore',scores)
+  }
+
 }
 
 module.exports = RoomController

@@ -14,7 +14,7 @@
     <section v-else>
       <!-- questioning -->
       <div v-if="gameState == 'questioning'">
-        <h1>เกมได้เริ่มขึ้นเเล้ว ตั้งตารอคำถามได้เลย</h1>
+        <h1>การตั้งคำถามได้เริ่มขึ้นเเล้ว ตั้งตารอคำถามได้เลย</h1>
       </div>
       <!-- hasQuestion -->
       <div v-else-if="gameState == 'hasQuestion'">
@@ -32,21 +32,27 @@
         <!-- is Respondents -->
         <div v-if="isRespondents == true">
           <h1>ยินดีด้วยคุณได้โอกาศตอบข้อนี้</h1>
-          <input
-            type="text"
-            placeholder="ใส่คำตอบของคุณลงที่นี่"
-            v-model="answer"
-            @click="sendAnswer(answer)"
-          >
+          <input type="text" placeholder="ใส่คำตอบของคุณลงที่นี่" v-model="answer">
+          <input type="button" value="ส่งคำตอบ" @click="sendAnswer(answer)">
         </div>
         <!-- is not Respondents -->
         <div v-else>
-           <h1>เสียใจด้วยคุณไม่ได้รับโอกาศตอบข้อนี้</h1>
+          <h1>เสียใจด้วยคุณไม่ได้รับโอกาศตอบข้อนี้</h1>
         </div>
       </div>
       <!-- consider_solutions -->
       <div v-else-if="gameState == 'consider_solutions'">
-        <h1>คำตอบ ;  {{answer}}</h1>
+        <h1>คำตอบ ; {{answer}}</h1>
+        <h2>{{result_answer}}</h2>
+      </div>
+      <!-- endGame -->
+      <div v-else-if="gameState == 'endGame'">
+        <h1>เกมส์จบเเล้ว</h1>
+        <ul>
+          <li v-for="(s,index) in score_report" v-bind:key="index">{{s}}</li>
+        </ul>
+        <input type="button" value="ออก" @click="exitGame()">
+
       </div>
     </section>
   </div>
@@ -66,7 +72,9 @@ export default {
     gameState: "questioning",
     question: "",
     isRespondents: false,
-    answer: ""
+    answer: "",
+    result_answer : "กำลังพิจารณา",
+    score_report : []
   }),
   computed: {
     ...mapState({
@@ -126,10 +134,36 @@ export default {
         }
         this.gameState = "answering";
       });
-      this.room.on("answer",e=>{
-        this.answer = e
-        this.gameState = 'consider_solutions'
+      this.room.on("answer", e => {
+        this.answer = e;
+        this.gameState = "consider_solutions";
+        this.result_answer = "กำลังพิจารณา"
+      });
+      this.room.on("checked_answer",e=>{
+          if(e){
+            this.result_answer = "ถูกต้อง"
+          }else {
+            this.result_answer = "ผิด"
+          }
       })
+      this.room.on("newRespondents", () => {
+        this.gameState = "select_respondents";
+        this.isRespondents = false;
+        this.answer = "";
+      });
+      this.room.on("newQuestion", () => {
+        this.gameState = "questioning";
+        this.question = "";
+        this.isRespondents = false;
+        this.answer = "";
+      });
+      this.room.on("endGame", (e) => {
+        this.gameState = "endGame";
+        this.score_report = e
+        this.question = "";
+        this.isRespondents = false;
+        this.answer = "";
+      });
     },
     sendMessage: async function(message) {
       this.room.emit("message", { body: message, user: this.user });
@@ -152,11 +186,15 @@ export default {
       this.room.emit("wantToAnswer", this.user);
       this.gameState = "select_respondents";
     },
-    sendAnswer (answer) {
-      this.room.emit("answer",answer)
-      this.gameState= 'consider_solutions'
-
+    sendAnswer(answer) {
+      this.room.emit("answer", answer);
+      this.result_answer = "กำลังพิจารณา"
+      this.gameState = "consider_solutions";
+    },
+     exitGame(){
+      this.roomState = 'normal'
     }
+  
   }
 };
 </script>
