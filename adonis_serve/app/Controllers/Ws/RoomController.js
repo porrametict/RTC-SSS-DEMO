@@ -37,7 +37,7 @@ class RoomController {
   }
 
   async onClose(e) {
-    console.log("close")
+    // console.log("close")
     this.removeUserFromSocket(this.socket.id)
     await this.updatePlayer()
     this.socket.close();
@@ -60,6 +60,10 @@ class RoomController {
     this.socket.broadcastToAll('gotRespondents',e)
     respondents_id = e
   }
+  async onUseMinigame (users) {
+    this.socket.broadcastToAll("useMinigame",users)
+  }
+ 
   onAnswer (e) {
     this.socket.broadcastToAll('answer',e)
   }
@@ -100,18 +104,35 @@ class RoomController {
   /// user control
 
   removeUserFromSocket(sk) {
-    players = players.filter(function (value) {
+    players = players.filter(function (value) {s
       return value.socket_id != sk
     })
   }
 
+  getSocketsFromUsers (users) {
+    let sockets = [];
+    players.forEach(p => {
+      users.forEach(u => {
+        // console.log(u.id,p.user.id)
+        if(u.id == p.user.id){
+          sockets.push(p.socket_id)
+        }
+      })
+    })
+    // console.log(sockets)
+    return sockets
+
+  }
+
+
+
   
   async updatePlayer(e) {
-    // console.log('update',players)
+    //  console.log('update',players)
     let empty = players.length == 0 ? true : false;
-    await this.socket.broadcastToAll("updatePlayer", { players: players, empty: empty })
-    //await console.log('finish')
-    return "";
+    this.socket.broadcastToAll("updatePlayer", { players: players, empty: empty })
+    // await console.log('finish')
+    // return "";
 
   }
    // score
@@ -126,7 +147,7 @@ class RoomController {
     if(new_user_score){
       scores.push({userId:r_id,score:score})
     }
-    console.log('collectScore',scores)
+    // console.log('collectScore',scores)
   }
 
 }

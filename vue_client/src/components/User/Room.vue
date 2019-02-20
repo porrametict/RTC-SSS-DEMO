@@ -25,8 +25,14 @@
       </div>
       <!-- select_respondents -->
       <div v-else-if="gameState == 'select_respondents'">
-        <h1>รอลุ้นกันดีกว่าว่าคุณจะได้ตอบหรือไม่</h1>
+        <h1>อยู่ระหว่างการเลือก</h1>
       </div>
+
+      <!-- minigame -->
+      <div v-if="gameState == 'miniGame'">
+        <mini-game :room="roomData.id"/>
+      </div>
+
       <!-- answering -->
       <div v-else-if="gameState == 'answering'">
         <!-- is Respondents -->
@@ -37,7 +43,7 @@
         </div>
         <!-- is not Respondents -->
         <div v-else>
-          <h1>เสียใจด้วยคุณไม่ได้รับโอกาศตอบข้อนี้</h1>
+          <h1>เป็นเรื่องที่น่าเสียดายที่คุณจะไม่ได้ตอบข้อนี้</h1>
         </div>
       </div>
       <!-- consider_solutions -->
@@ -52,16 +58,20 @@
           <li v-for="(s,index) in score_report" v-bind:key="index">{{s}}</li>
         </ul>
         <input type="button" value="ออก" @click="exitGame()">
-
       </div>
     </section>
   </div>
 </template>
 <script>
+import miniGame from "./miniGame";
+
 import { mapState } from "vuex";
 import Ws from "@adonisjs/websocket-client";
 const ws = Ws("ws://localhost:3333");
 export default {
+  components: {
+    miniGame
+  },
   data: () => ({
     players: [],
     roomData: null,
@@ -73,8 +83,8 @@ export default {
     question: "",
     isRespondents: false,
     answer: "",
-    result_answer : "กำลังพิจารณา",
-    score_report : []
+    result_answer: "กำลังพิจารณา",
+    score_report: []
   }),
   computed: {
     ...mapState({
@@ -126,6 +136,22 @@ export default {
         this.question = e;
         this.gameState = "hasQuestion";
       });
+      this.room.on("useMinigame", e => {
+        let useG = false;
+        e.forEach(element => {
+          //console.log(element.id,this.user.id , "=<")
+          if(element.id == this.user.id){
+               useG = true;
+          }
+        });
+        //console.log(useG,"useG")
+        if (useG == true) {
+          this.gameState = "miniGame";
+        } else {
+          this.gameState = 'answering'
+        }
+      });
+
       this.room.on("gotRespondents", e => {
         if (e == this.user.id) {
           this.isRespondents = true;
@@ -137,15 +163,15 @@ export default {
       this.room.on("answer", e => {
         this.answer = e;
         this.gameState = "consider_solutions";
-        this.result_answer = "กำลังพิจารณา"
+        this.result_answer = "กำลังพิจารณา";
       });
-      this.room.on("checked_answer",e=>{
-          if(e){
-            this.result_answer = "ถูกต้อง"
-          }else {
-            this.result_answer = "ผิด"
-          }
-      })
+      this.room.on("checked_answer", e => {
+        if (e) {
+          this.result_answer = "ถูกต้อง";
+        } else {
+          this.result_answer = "ผิด";
+        }
+      });
       this.room.on("newRespondents", () => {
         this.gameState = "select_respondents";
         this.isRespondents = false;
@@ -157,9 +183,9 @@ export default {
         this.isRespondents = false;
         this.answer = "";
       });
-      this.room.on("endGame", (e) => {
+      this.room.on("endGame", e => {
         this.gameState = "endGame";
-        this.score_report = e
+        this.score_report = e;
         this.question = "";
         this.isRespondents = false;
         this.answer = "";
@@ -188,13 +214,12 @@ export default {
     },
     sendAnswer(answer) {
       this.room.emit("answer", answer);
-      this.result_answer = "กำลังพิจารณา"
+      this.result_answer = "กำลังพิจารณา";
       this.gameState = "consider_solutions";
     },
-     exitGame(){
-      this.roomState = 'normal'
+    exitGame() {
+      this.roomState = "normal";
     }
-  
   }
 };
 </script>

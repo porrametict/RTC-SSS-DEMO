@@ -16,5 +16,6 @@
 const Ws = use('Ws')
 
 Ws.channel('room:*', 'RoomController')//.middleware(['auth'])
+Ws.channel('minigame:*','MiniGameController')
 
 

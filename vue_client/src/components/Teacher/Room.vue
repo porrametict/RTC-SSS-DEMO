@@ -35,6 +35,19 @@
       <!-- select_respondent -->
       <div v-else-if="gameState == 'select_respondents'">
         <h1>นี่คือคนที่ต้องการจะตอบ</h1>
+
+        <input
+          type="button"
+          @click="random_respondents(responents)"
+          value="สุ่มคนตอบ"
+          v-if="responents.length >= 2"
+        >
+        <input
+          type="button"
+          @click="useMiniGame()"
+          value="ใช้มินิเกมส์"
+          v-if="responents.length >= 2"
+        >
         <ul>
           <li v-for="(r,index) in responents" v-bind:key="index">
             {{r.first_name}} {{r.last_name}}
@@ -45,6 +58,10 @@
             >
           </li>
         </ul>
+      </div>
+      <!-- minigame -->
+      <div v-if="gameState == 'miniGame'">
+        <mini-game :room="roomData.id" @change="selectRespondents($event)"/>
       </div>
 
       <!-- answering -->
@@ -86,11 +103,15 @@
   </div>
 </template>
 <script>
+import miniGame from "./miniGame";
 import { mapState } from "vuex";
 import Ws from "@adonisjs/websocket-client";
 const ws = Ws("ws://localhost:3333");
 
 export default {
+  components: {
+    miniGame
+  },
   data: () => ({
     players: [],
     roomData: null,
@@ -199,6 +220,19 @@ export default {
       this.room.emit("getRespondents", id);
       this.gameState = "answering";
     },
+    random_respondents(items) {
+      let ramdom_item = items[Math.floor(Math.random() * items.length)];
+      //console.log(ramdom_item,"ramdom")
+      let confirm_response = confirm(`เลือก ${ramdom_item.first_name}`);
+      //console.log(confirm_response,'ca')
+      if (confirm_response == true) {
+        this.selectRespondents(ramdom_item.id);
+      }
+    },
+    useMiniGame() {
+      this.room.emit("useMinigame",this.responents);
+      this.gameState = 'miniGame'
+    },
     solution(result) {
       this.room.emit("solution", result);
       this.solution_q = result;
@@ -221,9 +255,9 @@ export default {
       this.responents = [];
       this.answer = "";
     },
-    exitGame(){
-      this.room.emit("exitGame")
-      this.roomState = 'normal'
+    exitGame() {
+      this.room.emit("exitGame");
+      this.roomState = "normal";
     }
   }
 };
