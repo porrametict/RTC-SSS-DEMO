@@ -33,11 +33,24 @@
         <h1>เกมได้เริ่มขึ้นเเล้ว ตั้งคำถามได้เลย</h1>
         <input type="text" placeholder="กรอกคำถามของคุณ" v-model="question">
         <input type="button" value="ส่งคำถาม" @click="sendQuestion(question)">
+        <!-- question package -->
+        <div v-if="question_package">
+          <hr>
+          <button @click="selectQuestion(question_package[0]);">ใช้ข้อบนสุด</button>
+          <hr>
+          คำถามที่ยังไม่ได้ใช้
+            <ul>
+              <li v-for="(q,index) in question_package" :key="index">
+                 ข้อ {{q.sequence_number}} : {{q.question}}
+                 <button @click="selectQuestion(q)">ใช้คำถามนี้</button>
+              </li>
+            </ul>
+          <hr>
+        </div>
       </div>
       <!-- select_respondent -->
       <div v-else-if="gameState == 'select_respondents'">
         <h1>นี่คือคนที่ต้องการจะตอบ</h1>
-
         <input
           type="button"
           @click="random_respondents(responents)"
@@ -123,6 +136,7 @@ export default {
     roomState: "normal",
     gameState: "questioning",
     question: "",
+    question_package : null,
     responents: [],
     answer: "",
     solution_q: null,
@@ -148,8 +162,11 @@ export default {
       await this.$store.dispatch("teacher/getUser");
     }
 
+
     let room_id = this.$route.params.room_id;
     this.roomData = await this.$store.dispatch("room/GetSingleRoom", room_id);
+    this.question_package = await this.$store.dispatch("question/getQuestions",room_id)
+
     this.connectServe();
   },
 
@@ -213,7 +230,18 @@ export default {
       this.room.emit("gameStart");
     },
 
+    arrayRemove (arr,value) {
+        return arr.filter(function(ele){
+          return ele != value
+        })
+    },
+
     //game state
+    selectQuestion(q){
+      this.sendQuestion(q.question)
+      this.question_package =  this.arrayRemove(this.question_package,q)
+      console.log("selectQuestion",this.question_package)
+    },
     sendQuestion(question) {
       this.room.emit("question", question);
       this.gameState = "select_respondents";
