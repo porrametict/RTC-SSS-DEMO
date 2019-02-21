@@ -9,6 +9,7 @@ import subject from './modules/subject'
 import room from './modules/room'
 import teacherSubject from './modules/teacherSubject'
 import studentSubject from './modules/studentSubject'
+import question from './modules/question'
 function store(name) {
     return function (resolve) {
       require(['./modules/' + name], resolve);
@@ -23,7 +24,8 @@ export default new Vuex.Store ({
       subject :subject,
       room : room,
       teacherSubject : teacherSubject,
-      studentSubject :  studentSubject 
+      studentSubject :  studentSubject ,
+      question : question
 
     }
 })

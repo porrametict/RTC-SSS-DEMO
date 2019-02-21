@@ -1,6 +1,8 @@
 <template>
   <div class="container" v-if="user">
     <h1>Room Teacher</h1>
+    <br>
+    <button @click="$router.push({name:'set-question-teacher',params : {room_id : roomData.id}})">set question</button>
     <hr>
     <!-- normal -->
     <div v-if="roomState =='normal'">

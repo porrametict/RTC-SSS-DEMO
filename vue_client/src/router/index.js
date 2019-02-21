@@ -12,6 +12,7 @@ import TeacherHome from '@/components/Teacher/Home'
 import TeacherRoom from '@/components/Teacher/Room'
 import TeacherTemplate from '@/components/Teacher/Template'
 import teacherSubject from '@/components/Teacher/subject';
+import teacherSetQuestion from '@/components/Teacher/SetQuestion';
 
 
 Vue.use(Router)
@@ -77,6 +78,11 @@ export default new Router({
           name: 'subject-teacher',
           component: teacherSubject
         },
+        {
+          path : 'set-question/:room_id',
+          name: 'set-question-teacher',
+          component : teacherSetQuestion
+        }
       ]
     },
 
