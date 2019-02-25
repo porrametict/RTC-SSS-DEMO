@@ -36,12 +36,22 @@ class RoomController {
     this.socket.broadcastToAll('message', e)
   }
 
-  async onClose(e) {
-    // console.log("close")
-    this.removeUserFromSocket(this.socket.id)
-    await this.updatePlayer()
-    this.socket.close();
+  async onClose(e) {  // unuse
+    // this.removeUserFromSocket(this.socket.id)
+    // // console.log("close")
+    // await this.updatePlayer()
+    // console.log("Socketclose")
+    // setTimeout(this.socket.close(),500)
   }
+
+  async onExitRoom() {
+    this.removeUserFromSocket(this.socket.id)
+    console.log("close")
+    await this.updatePlayer()
+    // console.log("Socketclose")
+    this.socket.close()
+  }
+  
 
   ///   game control
   async onGameStart() {
@@ -85,13 +95,14 @@ class RoomController {
     //console.log(scores,"scores")
   }
   async onExitGame () {
-    scores.forEach(async (val)=> {
+   await scores.forEach(async (val)=> {
       let newScore = new Score();
       let r_id = this.getRoomId()
       let new_score_data = {"room_id":r_id,"std_code":val.userId,"score":val.score}
       newScore.fill(new_score_data)
       await newScore.save()
     })
+    scores = []
   }
   /// room
   getRoomId () {
@@ -104,9 +115,10 @@ class RoomController {
   /// user control
 
   removeUserFromSocket(sk) {
-    players = players.filter(function (value) {s
+    players = players.filter(function (value) {
       return value.socket_id != sk
     })
+    // console.log(players)
   }
 
   getSocketsFromUsers (users) {
@@ -123,8 +135,6 @@ class RoomController {
     return sockets
 
   }
-
-
 
   
   async updatePlayer(e) {

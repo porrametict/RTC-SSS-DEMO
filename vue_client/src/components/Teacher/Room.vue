@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="user">
-    <h1>Room Teacher</h1>
+    <h1>Room Teacher</h1> 
     <br>
     <button @click="$router.push({name:'set-question-teacher',params : {room_id : roomData.id}})">set question</button>
     <hr>
@@ -148,11 +148,13 @@ export default {
     })
   },
   async created() {
-    window.addEventListener("beforeunload", this.confirmExit);
+    // window.addEventListener("beforeunload", this.confirmExit);
+    window.addEventListener("beforeunload", this.exitRoom);
+    let vm = this;
     window.onhashchange = function() {
       let v = confirm("ต้องการจะออกจากห้องจริงๆใช่ไหม");
       if (v == true) {
-        this.exitRoom;
+          vm.exitRoom();
       } else {
         window.history.forward();
       }
@@ -174,7 +176,7 @@ export default {
     connectServe: function() {
       ws.connect();
       this.room = ws.subscribe(`room:${this.roomData.id}`);
-      this.room.on("resady", () => {
+      this.room.on("ready", () => {
         this.room.emit("joinRoom", { user: this.user, ishost: true });
       });
       this.room.on("message", e => {
@@ -219,10 +221,11 @@ export default {
     },
     confirmExit(e) {
       e.preventDefault();
+       this.exitRoom()
       return "";
     },
     exitRoom() {
-      this.room.emit("close");
+      this.room.emit("exitRoom");
     },
 
     /// game Control

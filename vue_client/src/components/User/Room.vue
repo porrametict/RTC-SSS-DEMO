@@ -92,11 +92,14 @@ export default {
     })
   },
   async created() {
-    window.onbeforeunload = this.confirmExit;
+    // window.onbeforeunload = this.confirmExit;
+    window.onbeforeunload = this.exitRoom;
+    let vm = this;
     window.onhashchange = function() {
       let v = confirm("ต้องการจะออกจากห้องจริงๆใช่ไหม");
       if (v == true) {
-        this.exitRoom;
+        vm.exitRoom();
+        console.log("true")
       } else {
         window.history.forward();
       }
@@ -198,12 +201,13 @@ export default {
       this.messages.push(message);
     },
     exitRoom() {
-      console.log("exitrRoom");
-      this.room.emit("close");
+      // console.log("exitrRoom");
+      this.room.emit("exitRoom");
     },
 
     confirmExit(e) {
       e.preventDefault();
+      this.exitRoom()
 
       return "";
     },
