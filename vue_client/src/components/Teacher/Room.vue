@@ -31,6 +31,15 @@
       <!-- questioning -->
       <div v-if="gameState =='questioning'">
         <h1>เกมได้เริ่มขึ้นเเล้ว ตั้งคำถามได้เลย</h1>
+        <br>
+        เลือกรูปเเบบ การเลือกผู้ตอบ
+         <select v-model="selectRespondentsMode" aria-placeholder="select">
+          <option selected >ปกติ</option>
+          <option selected >ใช้มินิเกมส์</option>
+        </select>
+        <br>
+        <br>
+
         <input type="text" placeholder="กรอกคำถามของคุณ" v-model="question">
         <input type="button" value="ส่งคำถาม" @click="sendQuestion(question)">
         <!-- question package -->
@@ -135,6 +144,7 @@ export default {
     inputMessage: null,
     roomState: "normal",
     gameState: "questioning",
+    selectRespondentsMode : "ปกติ",
     question: "",
     question_package : null,
     responents: [],
@@ -248,6 +258,10 @@ export default {
     sendQuestion(question) {
       this.room.emit("question", question);
       this.gameState = "select_respondents";
+      if(this.selectRespondentsMode == "ใช้มินิเกมส์"){
+        this.useMiniGame()
+
+      }
     },
     selectRespondents(id) {
       this.room.emit("getRespondents", id);
@@ -263,7 +277,8 @@ export default {
       }
     },
     useMiniGame() {
-      this.room.emit("useMinigame",this.responents);
+      // this.room.emit("useMinigame",this.responents);
+      this.room.emit("useMinigame",this.players);
       this.gameState = 'miniGame'
     },
     solution(result) {

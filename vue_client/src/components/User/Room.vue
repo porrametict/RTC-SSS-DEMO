@@ -143,11 +143,11 @@ export default {
         let useG = false;
         e.forEach(element => {
           //console.log(element.id,this.user.id , "=<")
-          if(element.id == this.user.id){
+          if(element.user.id == this.user.id){
                useG = true;
           }
         });
-        //console.log(useG,"useG")
+        console.log(useG,"useG",e)
         if (useG == true) {
           this.gameState = "miniGame";
         } else {
